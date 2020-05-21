@@ -1,4 +1,4 @@
-# User Guide Bridge
+# SAE Documentation Bridge
 
 The User Guide Bridge is a simple microservice designed to route formatted help document requests from a content provider to a user interface.
 
