@@ -57,7 +57,27 @@ async function getDocument(token, id) {
   }
 }
 
+async function prefetch({ applications, token }) {
+  try {
+    const results = await search(token, applications);
+    const documents = Promise.all(
+      results.map(async result => {
+        const document = await getDocument(token, result.documentId);
+        return {
+          key: document.tags,
+          val: document,
+        };
+      }),
+    );
+
+    return documents;
+  } catch (err) {
+    log(err);
+  }
+}
+
 module.exports = {
   getDocument,
+  prefetch,
   search,
 };
