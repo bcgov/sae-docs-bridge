@@ -1,3 +1,4 @@
+const compact = require('lodash/compact');
 const config = require('config');
 const nodeFetch = require('node-fetch');
 const fetch = require('fetch-retry')(nodeFetch);
@@ -5,10 +6,13 @@ const fetch = require('fetch-retry')(nodeFetch);
 const log = require('../utils/log');
 
 const host = config.get('host');
+const documentTypes = config.get('documentTypes');
 
 async function search(token, terms = []) {
   try {
-    const keywords = terms.map(a => `"${a}"`).join(' ');
+    const keywords = compact(terms)
+      .map(a => `"${a}"`)
+      .join(' ');
     const response = await fetch(`${host}/search`, {
       method: 'POST',
       headers: {
@@ -57,20 +61,29 @@ async function getDocument(token, id) {
   }
 }
 
-async function prefetch({ applications, token }) {
+function wait() {
+  return new Promise(resolve => {
+    setTimeout(() => resolve(), 1000);
+  });
+}
+
+async function prefetch(applications, cache, token) {
   try {
     const results = await search(token, applications);
-    const documents = Promise.all(
-      results.map(async result => {
-        const document = await getDocument(token, result.documentId);
-        return {
-          key: document.tags,
-          val: document,
-        };
-      }),
+    const relevantResults = results.filter(d =>
+      d.tags.split('#').some(tag => documentTypes.includes(tag)),
     );
 
-    return documents;
+    log('Caching %o articles', relevantResults.length);
+
+    for (let index = 0; index < relevantResults.length; index++) {
+      const result = relevantResults[index];
+      const document = await getDocument(token, result.documentId);
+      cache.set(result.tags, document);
+      await wait();
+    }
+
+    log('Cached %o articles', relevantResults.length);
   } catch (err) {
     log(err);
   }

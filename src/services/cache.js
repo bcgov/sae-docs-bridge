@@ -1,26 +1,29 @@
+'use strict';
+const compact = require('lodash/compact');
 const NodeCache = require('node-cache');
 
+const std = 60 * 60 * 48;
+const nodeCache = new NodeCache({
+  stdTLL: std,
+  checkPeriod: std * 0.2,
+  useClones: false,
+});
+
 class Cache {
-  constructor() {
-    const std = 60 * 60 * 48;
-    this.cache = new NodeCache({
-      stdTLL: std,
-      checkPeriod: std * 0.2,
-      useClones: false,
-    });
+  constructor(cache) {
+    this.cache = cache;
   }
 
-  get(key, fn) {
-    const value = this.cache.get(key);
+  get(key) {
+    return this.cache.get(key);
+  }
 
-    if (value) {
-      return Promise.resolve(value);
+  set(key, value) {
+    if (Array.isArray(key)) {
+      this.cache.mset(key);
+    } else {
+      this.cache.set(key, value);
     }
-
-    return fn().then(result => {
-      this.cache.set(key, result);
-      return result;
-    });
   }
 
   flush() {
@@ -28,4 +31,20 @@ class Cache {
   }
 }
 
-module.exports = Cache;
+const cache = new Cache(nodeCache);
+
+function middleware(req, res, next) {
+  const { app, keyword } = req.params;
+  const { role } = req.query;
+  const key = compact([app, keyword, role]).join('#');
+  const cached = nodeCache.get(`#${key}#`);
+
+  if (cached) {
+    return res.json(cached);
+  }
+
+  next();
+}
+
+module.exports = cache;
+module.exports.middleware = middleware;
