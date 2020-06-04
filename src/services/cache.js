@@ -36,7 +36,8 @@ const cache = new Cache(nodeCache);
 function middleware(req, res, next) {
   const { app, keyword } = req.params;
   const { role } = req.query;
-  const key = compact([app, keyword, role]).join('#');
+  const terms = [app, keyword, role];
+  const key = compact(terms).join('#');
   const cached = nodeCache.get(`#${key}#`);
 
   if (cached) {
