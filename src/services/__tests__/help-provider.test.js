@@ -1,7 +1,9 @@
+jest.mock('../cache');
 jest.mock('node-fetch', () => require('fetch-mock-jest').sandbox());
 const fetchMock = require('node-fetch');
 
-const { getDocument, search } = require('../help-provider');
+const { getDocument, prefetch, search } = require('../help-provider');
+const cache = require('../cache');
 fetchMock.config.overwriteRoutes = true;
 const result = [
   {
@@ -70,6 +72,36 @@ describe('services/help-provider', () => {
 
       try {
         await getDocument('123', null);
+      } catch (e) {
+        expect(e).not.toBeFalsy();
+      }
+    });
+  });
+
+  describe('#prefetch', () => {
+    it('should filter the relevant apps', async () => {
+      const document = {
+        id: '111b',
+      };
+      fetchMock.post('https://help-api/api/search', [
+        {
+          id: '111a',
+          itemType: 'tag',
+          documentId: '111b',
+          documentSlug: 'sae-onboarding',
+          document: 'SAE Onboarding',
+          tags: '#ocwa#onboarding#',
+        },
+      ]);
+      fetchMock.get('https://help-api/api/fetch/page/111b', document);
+
+      await prefetch(['ocwa'], cache, '123');
+      expect(cache.set).toHaveBeenCalledWith('#ocwa#onboarding#', document);
+    });
+
+    it('should throw an error', async () => {
+      try {
+        await prefetch();
       } catch (e) {
         expect(e).not.toBeFalsy();
       }
