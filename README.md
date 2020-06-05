@@ -15,17 +15,21 @@ const req = request('https://usebridge.url/api/v1/article/bbsae/onboarding');
 // Optionally specify a role if different user types require access to different content
 const req = request('https://usebridge.url/api/v1/article/ocwa/onboarding?role=exporter');
 
+// Flush the cache
+$ curl https://usebridge.url/api/v1/flush
 ```
 
 #### Content
 
-Currently the application uses a single API for consuming content (Documeize) and utilizes tags for finding content, so content needed for your application should contain tags that match the API's requests
+Currently the application uses a single API for consuming content (Documeize) and utilizes tags for finding content, so content needed for your application should contain tags that match the API's requests.
 
 ```
-Tags:           ocwa onboarding      exporter
+Tags:            app  document type     role
                   |      |               |
-/api/v1/article/ocwa/onboarding/role=exporter
+/api/v1/article/ocwa/onboarding?role=exporter
 ```
+
+When the application starts up it will search for all `applications` and `documentTypes` definited in the config and cache them. You can flush the cache via `/api/v1/flush`.
 
 ## Installation
 
@@ -50,15 +54,16 @@ Run `npm run start:prod` to run the production configured server.
 
 ### Configuration Options
 
-| Value                                                                       | Property       |
-|-----------------------------------------------------------------------------|----------------|
-| The host URL of the target API, e.g. `https://helpapi.com/api`              | `host`         |
-| The port for Express to run on                                              | `port`         |
-| The API auth token required to connect to the API                           | `token`        |
-| An array of application names (generally tags)                              | `applications` |
-| The [debug](https://www.npmjs.com/package/morgan) namespace for logging     | `logLevel`     |
-| The format level for [Morgan](https://www.npmjs.com/package/morgan)         | `morganFormat` |
-| An array of whitelisted UI urls, for CORS, e.g. `["http://localhost:8080"]` | `whitelist`    |
+| Value                                                                       | Property        |
+|-----------------------------------------------------------------------------|-----------------|
+| The host URL of the target API, e.g. `https://helpapi.com/api`              | `host`          |
+| The port for Express to run on                                              | `port`          |
+| The API auth token required to connect to the API                           | `token`         |
+| An array of application names (generally tags)                              | `applications`  |
+| An array of the document types to search for (see taxonomy above)           | `documentTypes` |
+| The [debug](https://www.npmjs.com/package/morgan) namespace for logging     | `logLevel`      |
+| The format level for [Morgan](https://www.npmjs.com/package/morgan)         | `morganFormat`  |
+| An array of whitelisted UI urls, for CORS, e.g. `["http://localhost:8080"]` | `whitelist`     |
 
 ## Developer Guidelines
 
