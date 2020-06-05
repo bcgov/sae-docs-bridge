@@ -3,7 +3,9 @@ const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
 
-const auth = require('./middleware/auth');
+const cache = require('./services/cache');
+const authMiddleware = require('./middleware/auth');
+const { prefetch } = require('./services/help-provider');
 const v1 = require('./routes/api/v1');
 
 // Config
@@ -27,14 +29,19 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan(format));
 }
 
-app.use(
-  auth({
+app.use([
+  authMiddleware({
     token,
-    app,
-    applications,
   }),
-);
-app.use(cors(corsOptions));
+  cors(corsOptions),
+]);
 app.use('/api/v1', v1);
 
-module.exports = app;
+app.on('flush', () => prefetch(applications, cache, token));
+
+module.exports = {
+  boot() {
+    prefetch(applications, cache, token);
+    return app;
+  },
+};

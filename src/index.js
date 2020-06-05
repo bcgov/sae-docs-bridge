@@ -5,6 +5,6 @@ const app = require('./app');
 
 const port = config.get('port');
 
-app.listen(port, () => {
+app.boot().listen(port, () => {
   log(`userguide-bridge listening on port ${port}!`);
 });

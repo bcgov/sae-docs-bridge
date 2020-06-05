@@ -1,48 +1,47 @@
+const compact = require('lodash/compact');
 const express = require('express');
 
-const Cache = require('../../services/cache');
-const { getDocument } = require('../../services/help-provider');
+const cache = require('../../services/cache');
+const { getDocument, search } = require('../../services/help-provider');
 
 const router = express.Router();
-const cache = new Cache();
 
 router.get('/', (req, res) => {
   res.send('Nothing to see here');
 });
 
-router.get('/article/:app/:keyword', async (req, res, next) => {
-  const { token } = req;
-  const { apps } = req.app.locals;
-  const { app, keyword } = req.params;
-  const { role } = req.query;
+router.get('/flush', (req, res, done) => {
+  cache.flush();
+  res.send('Cache flushed');
+  req.app.emit('flush');
+  done();
+});
 
-  if (!apps) {
-    res.sendStatus(404);
-    return next();
-  }
+router.get(
+  '/article/:app/:keyword',
+  cache.middleware,
+  async (req, res, next) => {
+    const { token } = req;
+    const { app, keyword } = req.params;
+    const { role } = req.query;
+    const terms = compact([app, keyword, role]);
 
-  try {
-    const response = await cache.get(`${app}-${keyword}`, async () => {
-      const result = apps
-        .filter(d => d.tags.split('#').includes(app))
-        .filter(d => {
-          if (role) {
-            return d.tags.split('#').includes(role);
-          }
-          return true;
-        })
-        .find(d => d.tags.split('#').includes(keyword));
+    try {
+      const searchResults = await search(token, terms);
+      const result = searchResults.find(d => {
+        const tags = compact(d.tags.split('#'));
+        return tags.every(t => terms.includes(t));
+      });
       const id = result && result.documentId;
       const document = await getDocument(token, id);
-      return document;
-    });
 
-    res.json(response);
-  } catch (err) {
-    next(err);
-  }
+      res.json(document);
+    } catch (err) {
+      next(err);
+    }
 
-  next();
-});
+    next();
+  },
+);
 
 module.exports = router;
