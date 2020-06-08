@@ -1,0 +1,42 @@
+os: linux
+dist: trusty
+sudo: required
+language: node_js
+services:
+- docker
+jobs:
+  include:
+  - name: SAE Docs Bridge API
+    stage: APIs
+    language: node_js
+    node_js: lts/*
+    cache: npm
+    before_install:
+    - |-
+      cd /home/travis/build/bcgov/sae-docs-bridge
+      npm ci
+      if [ "$TRAVIS_TAG" = "" ]; then npm audit --production; fi
+    before_script:
+    - |-
+      cd /home/travis/build/bcgov/sae-docs-bridge
+      cp config/default.json.template config/default.json
+    script:
+    - |-
+      cd /home/travis/build/bcgov/sae-docs-bridge
+      npm test
+    - |-
+      cd /home/travis/build/bcgov/sae-docs-bridge
+      bash ../.travis/docker_quayio_push sae-docs-bridge
+    before_deploy:
+    - cd /home/travis/build/bcgov/sae-docs-bridge
+    deploy:
+      provider: script
+      script: bash docker_push sae_docs_bridge || travis_terminate 1
+      on:
+        all_branches: true
+        condition: "$TRAVIS_BRANCH =~ ^master|develop$ || -n $TRAVIS_TAG"
+
+env:
+  global:
+  - secure: ""
+  - secure: ""
