@@ -24,7 +24,6 @@ jobs:
     - |-
       cd /home/travis/build/bcgov/sae-docs-bridge
       npm test
-      bash docker_quayio_push sae_docs_bridge
     before_deploy:
     - cd /home/travis/build/bcgov/sae-docs-bridge
     deploy:
