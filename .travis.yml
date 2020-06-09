@@ -24,17 +24,19 @@ jobs:
     - |-
       cd /home/travis/build/bcgov/sae-docs-bridge
       npm test
+    - |-
+      cd /home/travis/build/bcgov/sae-docs-bridge
+      bash docker_quayio_push sae-docs-bridge
     before_deploy:
     - cd /home/travis/build/bcgov/sae-docs-bridge
     deploy:
       provider: script
-      script: bash docker_push sae_docs_bridge || travis_terminate 1
+      script: echo "nothing"
       on:
         all_branches: true
         condition: "$TRAVIS_BRANCH =~ ^master|develop$ || -n $TRAVIS_TAG"
 env:
   global:
-  - DOCKER_USERNAME=h3brandon
-  - QUAYIO_USERNAME=h3brandon
-  - secure: jOkX/j0iuqhkdEaHQmy6r2rDtlCjMiBOT73oVzD33cKHE7KLqC5v1xBwZZyM0sriZlceuzxihUGGRIBOQwePXbDaz+EdHjwmXtw80Ch8njPecgJQD2b94np/ml9K7jfPLcqjF80SyL2RerOYWpVJKd0G1+F8Eu1ZdPaK2Cxl/DZmsnWj5U2uuRw6Qm/bAcLVhy+09ju4XPO+zFn1E8p8f5KmHx4RYiv6Nfg8li+74b7W3GrDhZ13Nie0fC2FdpHyQlzwKYn5Se1Pj59yE8E+sAJru3QGV6xKdmzFEYaO0eMTo1+Cgh4pH7aN72t2rG5rozlleHWwSZNjys07SKFZsbKctDytcI7YVQ8Z0qGDUURRO7RyuZBnqbd/6AdGVnuK/le7ZbSUz1f0MqORI85Ezfp5Ok/Y3Go4CitHRdOqeaGxzYQ7qcnxPwYjC5kUzPxmMkCD/8IZspGOytvFKR31eev70yRYv+kmLIRJNV+tksBLetlE2FasFLL0MoKE21I0bOOLMpQKi3EFaY8QzubTclD/69vncGH457S1IShx7URaZ7OhdHNIFkSvvkVTDLZvNdtS9G5naqhym1Vra9jqQMwdYfKSssSQes97WtbI/wIwxl+jmd4a3I7sZzmh6i6UKmjbDtsdvALQt4f+k81KUbwB5t2PdrzaeWKRKR3mR6o=
-  - secure: iQKR7q/QPJuI4vjfeguUd4/nEhSmeDwH1/PFG0Ezy1e8xJTFeJ9UXHdn2zZzP7+iR0ohonnVLswcN+/twsxipV6V+Kmd9jTBDDYLZqZdaaiuc78IBiIKlIxHiS+C6OSzeMJg8Y29NMd2EQLezGBPElLyA+sQiu728SEYLQApItlsjrh4yobPFCdcqsBC3VInlg07Ou9mAnmvda6Bm/X+Hmr/BneBSTfwTNmLw8C4hi+5xVvKqy6nXcZTtBqK3CHXjqy5C3TOA+vplqq7d3f1wyVqRpKmVlnd1i4RDXtaIXR4/cFX/c8TkACjn8udJL+sL/trBYjJsZpeyDJ/WEfF0HhpFWWm1KtuL/ziOB5TE0eEHVJA6+woIZqEKjTGJ6iGgAUShpX+rHLox+H0uQGVwV0xbZAy4D5GCa1A5V6kVNdRX3bsBMp7+zC8MW+vaQUi1K89q9gGKYQaT4YuP6DG9Y78cJi/qMakjzAfjmLmNEpiLXhWxUmeAFBqN6ngu5AQ25Ln03G67511Q3CshXxv+93ZhU/6hWHL9aKiLMHR0V97PYUBfh02PAShAVZmccuPqk7T2UVAkgPXAhphKlZKnp8F+oO7/M7TCH4Xz+0JV68sJzTcJfeIBpdvsEua5os0un+pQlvRfkgHiRqgAGwNCQLABMiOLWdkYitL2hsi96g=
+  - secure: "pBAbNx0PEXQk/CZyJpE0ObAAr6qpLesPgyC9s2OGqcHtVdmRBftlW+4hDZoKGWxkeYN5N6e/w1UxzT1CahedLsmIi2/HNXJuNIx7NWQKdWEdBzGOSBSz7GzIQCkHamc5rptShfuMNfll9Gm/Kpq7+d4whQYg7vagloDydqKJCgDx9rSCC3wExLREd7jHuQ5gtcAqBxbWAnUJPlQuUdKWFXXWEFiSuuLVY78oEIBO0mTY2abGi4UkCtDzqLw3v5Uz1ph7YqSISAz0i0ce/rtM13U/ADvNdAgS6U2sS56iYhkW1vFhd+PW5QeUaX98bRRq6ZwZDmfoPv7h53uhpFu1TI3uV56X0qZ8aTGKhIUssSh5oMosYdfDe0k8lFepc+hgkZ+HDjgWWvU+zLjT4QndzJhGVTrQEpiV2xhM/Cl+NJI6VQOusUNUFxHLBDQVOJuywkmUo1WlXx2kVvmmwz7IS8xr2KYWq2IxEtMrI11p+cHZQwZ9l4rd2t+nUadkVbKiB/ahv8FcSC+7wTTm8Bn0IrrAazq43eNBwHTjIxbCz+9cze+bUvNnLeD/Cfpqx2vCC1g7Bp39xNhXTntlM5/aFI+SVLjH9CNGyFGn8p6jrHUP36xbTXb4g1RSgDXopTKFE6L6r+NxMY1XfH+IdMvnUkGyo66fKOZx01/fosWbvDw="
+  - secure: "jcRvn3Ei31YcUUo6LOAMtJnoxOeKOX1WgtFIuJMz2IznteVGz/iP53SbZphSlVPQG/1Pbzh2DeefgoYdu0G/Mjl2zwDRM1u630A5ZDFteSiIc0R8e9HNg7P+hZolAl6jCG5ifqf72d8OPJOKTUSdjsZ1y/FQq1dFqJbGLl8sWN0hvel/KjZ2YPJhuAtMa3Gpx4kdDfOWTHH2f0bMrQPUq9XCSooroOwf7H1F6TiVe6c40VhhfGBxpgKTNZy79rupOvx+Fy4s226ZkDF9G/bnrjNXX6IsWM0YSvRYkpPMjWVvgseUG1W2qKRY6+de9RpQbKWc9N6Ho8ONJc5865i5IoZ4l0k2FLWsiHSmrSvs8xJ9ePyqiTP25rKuMQ55mBzBj00AlePKZMBIV22DVbc43a6No9rywQqT6ZoJSzpZc6k1UUEJn9QG1cd+i9AZFvVQAzhZLo3vd9KAB6cQ0SDP6CEl6MYX25rL3QhCE8MdoZ31z6AE5QwGCC1KtBq9JNtDi3TZ26as4ReMj3UCaTxyop8zBlXqTtAoWJ31q9r6/lGN06O1PYp7wh1Rj9urDOE8PT5SE9irlUjh7HZQmhYGz6xCazmkSsLIvbkEomSMmyvwXZdy5eI3cSOPlHsItu+s3TRYS7nUAO/DoWTRIU7Y6HoQZP+74LQ0X3LSiOgW7Qw="
+
