@@ -24,12 +24,12 @@ jobs:
     - |-
       cd /home/travis/build/bcgov/sae-docs-bridge
       npm test
-      bash docker_quayio_push sae_docs_bridge
+      bash docker_quayio_push sae-docs-bridge
     before_deploy:
     - cd /home/travis/build/bcgov/sae-docs-bridge
     deploy:
       provider: script
-      script: bash docker_push sae_docs_bridge || travis_terminate 1
+      script: bash docker_push sae-docs-bridge || travis_terminate 1
       on:
         all_branches: true
         condition: "$TRAVIS_BRANCH =~ ^master|develop$ || -n $TRAVIS_TAG"
