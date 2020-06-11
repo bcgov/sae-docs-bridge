@@ -3,6 +3,7 @@
   "port": "8000",
   "token": "token",
   "applications": ["add app names here"],
+  "documentTypes": ["add document types here, e.g. onboarding"],
   "logLevel": "prod",
   "morganFormat": "combined",
   "whitelist": ["hub/ui webapp URL"]

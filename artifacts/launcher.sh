@@ -8,6 +8,7 @@ cat > ./config/production.json <<EOF
   "port": 8000,
   "token": "${HELP_API_TOKEN}",
   "applications": [${HELP_APPS}],
+  "documentTypes": [${HELP_DOCUMENT_TYPES}],
   "logLevel": "prod",
   "morganFormat": "combined",
   "whitelist": [${CORS_WHITELIST}]
