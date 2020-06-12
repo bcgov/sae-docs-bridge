@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cat > ./config/production.json <<EOF
+cat > /usr/src/app/config/production.json <<EOF
 {
   "host": "${HELP_API_HOST}",
   "port": 8000,

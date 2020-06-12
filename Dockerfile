@@ -10,7 +10,7 @@ COPY src /usr/src/app/src
 ENV NODE_ENV production
 
 # Set up launcher
-RUN mkdir /config && chmod 777 /config
+RUN mkdir /usr/src/app/config && chmod 777 /usr/src/app/config
 COPY artifacts/launcher.sh /usr/local/bin/launcher.sh
 RUN chmod +x /usr/local/bin/launcher.sh && \
     chown node:users /usr/src/app
