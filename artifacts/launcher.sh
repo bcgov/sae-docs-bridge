@@ -1,7 +1,5 @@
 #!/bin/sh
 
-mkdir -p ./config
-
 cat > ./config/production.json <<EOF
 {
   "host": "${HELP_API_HOST}",
