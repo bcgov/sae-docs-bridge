@@ -21,6 +21,7 @@ if [ $TRAVIS_BRANCH == "master" ]; then
     docker push $BCGOV_BASE/$REPO:latest
     docker push $BCGOV_BASE/$REPO:$TRAVIS_COMMIT
     echo "latest and $TRAVIS_COMMIT pushed successfully"
+    curl -d '' $WEBHOOK_URL
 fi
 
 if [ $TRAVIS_BRANCH == "develop" ]; then
@@ -28,6 +29,7 @@ if [ $TRAVIS_BRANCH == "develop" ]; then
     echo "dockerfile tagged pushing now"
     docker push $BCGOV_BASE/$REPO:edge
     echo "edge (develop) pushed successfully"
+    curl -d '' $WEBHOOK_URL
 fi
 
 if [ "$TRAVIS_BRANCH" == "$TRAVIS_TAG" ]; then
