@@ -52,5 +52,13 @@ describe('services/cache', () => {
       expect(json).not.toHaveBeenCalled();
       expect(next).toHaveBeenCalled();
     });
+
+    it('should throw an error', () => {
+      const next = jest.fn();
+      const res = {};
+
+      cache.middleware({}, res, next);
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
+    });
   });
 });
