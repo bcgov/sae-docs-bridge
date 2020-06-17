@@ -34,17 +34,21 @@ class Cache {
 const cache = new Cache(nodeCache);
 
 function middleware(req, res, next) {
-  const { app, keyword } = req.params;
-  const { role } = req.query;
-  const terms = [app, keyword, role];
-  const key = compact(terms).join('#');
-  const cached = nodeCache.get(`#${key}#`);
+  try {
+    const { app, keyword } = req.params;
+    const { role } = req.query;
+    const terms = [app, keyword, role];
+    const key = compact(terms).join('#');
+    const cached = nodeCache.get(`#${key}#`);
 
-  if (cached) {
-    return res.json(cached);
+    if (cached) {
+      return res.json(cached);
+    }
+
+    next();
+  } catch (err) {
+    next(err);
   }
-
-  next();
 }
 
 module.exports = cache;
