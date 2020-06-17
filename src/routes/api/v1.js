@@ -10,11 +10,11 @@ router.get('/', (req, res) => {
   res.send('Nothing to see here');
 });
 
-router.get('/flush', (req, res, done) => {
+router.get('/flush', (req, res, next) => {
   cache.flush();
   res.send('Cache flushed');
   req.app.emit('flush');
-  done();
+  next();
 });
 
 router.get(

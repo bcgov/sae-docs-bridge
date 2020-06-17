@@ -1,3 +1,4 @@
+const compact = require('lodash/compact');
 const config = require('config');
 const cors = require('cors');
 const express = require('express');
@@ -17,7 +18,11 @@ const format = config.get('morganFormat');
 
 const corsOptions = {
   origin(origin, callback) {
-    if (whitelist.length === 0 || whitelist.indexOf(origin) !== -1 || !origin) {
+    if (
+      compact(whitelist).length === 0 ||
+      whitelist.indexOf(origin) !== -1 ||
+      !origin
+    ) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS ' + origin));
@@ -37,12 +42,6 @@ app.use([
   cors(corsOptions),
 ]);
 app.use('/api/v1', v1);
-
-// Error handling
-app.use(function(err, req, res) {
-  log(err.stack);
-  res.status(500).send(err.statusMessage);
-});
 
 // Catch the flush event and refresh cache
 app.on('flush', () => prefetch(applications, cache, token));
