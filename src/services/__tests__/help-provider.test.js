@@ -19,6 +19,7 @@ const results = [
     documentSlug: 'sae-onboarding',
     document: 'SAE Onboarding',
     tags: '#bbsae#onboarding#',
+    revised: '2020-05-29T18:05:42Z',
   },
 ];
 fetchMock
@@ -26,6 +27,10 @@ fetchMock
   .post('https://help-api/api/search', results);
 
 describe('services/help-provider', () => {
+  afterEach(() => {
+    fetchMock.mockClear();
+  });
+
   describe('#search', () => {
     it('should search', async () => {
       await expect(search('123', ['app1', 'app2'])).resolves.toEqual(results);
@@ -91,11 +96,16 @@ describe('services/help-provider', () => {
           documentSlug: 'sae-onboarding',
           document: 'SAE Onboarding',
           tags: '#ocwa#onboarding#',
+          revised: '2020-05-29T18:05:42Z',
         },
       ]);
       fetchMock.get('https://help-api/api/fetch/page/111b', document);
 
       await prefetch(['ocwa'], cache, '123');
+      expect(fetchMock).toHaveLastFetched(
+        'https://help-api/api/fetch/page/111b',
+        'get',
+      );
       expect(cache.set).toHaveBeenCalledWith('#ocwa#onboarding#', document);
     });
 
@@ -105,6 +115,69 @@ describe('services/help-provider', () => {
       } catch (e) {
         expect(e).not.toBeFalsy();
       }
+    });
+
+    it('should not fetch an up to date document', async () => {
+      const savedCache = {
+        get() {
+          return [
+            {
+              meta: {
+                revised: '2020-05-29T18:05:42Z',
+              },
+            },
+          ];
+        },
+      };
+      fetchMock.post('https://help-api/api/search', [
+        {
+          id: '111a',
+          itemType: 'tag',
+          documentId: '111b',
+          documentSlug: 'sae-onboarding',
+          document: 'SAE Onboarding',
+          tags: '#ocwa#onboarding#',
+          revised: '2020-05-29T18:05:42Z',
+        },
+      ]);
+      await prefetch(['ocwa'], savedCache, '123');
+      expect(fetchMock).not.toHaveLastFetched(
+        'https://help-api/api/fetch/page/111b',
+        'get',
+      );
+    });
+
+    it('should fetch an out of date document', async () => {
+      const spy = jest.fn();
+      const savedCache = {
+        get() {
+          return [
+            {
+              meta: {
+                revised: '2020-04-29T18:05:42Z',
+              },
+            },
+          ];
+        },
+        set: spy,
+      };
+      fetchMock.post('https://help-api/api/search', [
+        {
+          id: '111a',
+          itemType: 'tag',
+          documentId: '111b',
+          documentSlug: 'sae-onboarding',
+          document: 'SAE Onboarding',
+          tags: '#ocwa#onboarding#',
+          revised: '2020-05-29T18:05:42Z',
+        },
+      ]);
+      await prefetch(['ocwa'], savedCache, '123');
+      expect(spy).toHaveBeenCalled();
+      expect(fetchMock).toHaveLastFetched(
+        'https://help-api/api/fetch/page/111b',
+        'get',
+      );
     });
   });
 });

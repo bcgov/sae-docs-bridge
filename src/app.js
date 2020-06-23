@@ -6,7 +6,6 @@ const morgan = require('morgan');
 
 const authMiddleware = require('./middleware/auth');
 const cache = require('./services/cache');
-const log = require('./utils/log');
 const { prefetch } = require('./services/help-provider');
 const v1 = require('./routes/api/v1');
 

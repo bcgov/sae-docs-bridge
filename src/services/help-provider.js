@@ -3,6 +3,7 @@ const config = require('config');
 const nodeFetch = require('node-fetch');
 const fetch = require('fetch-retry')(nodeFetch);
 
+const { compare, wait } = require('../utils/helpers');
 const log = require('../utils/log');
 
 const host = config.get('host');
@@ -61,12 +62,6 @@ async function getDocument(token, id) {
   }
 }
 
-function wait() {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(), 1000);
-  });
-}
-
 async function prefetch(applications, cache, token) {
   try {
     const results = await search(token, applications);
@@ -78,9 +73,14 @@ async function prefetch(applications, cache, token) {
 
     for (let index = 0; index < relevantResults.length; index++) {
       const result = relevantResults[index];
-      const document = await getDocument(token, result.documentId);
-      cache.set(result.tags, document);
-      await wait();
+      const cachedDocument = cache.get(result.tags);
+      const isInvalid = compare(result, cachedDocument);
+
+      if (isInvalid) {
+        const document = await getDocument(token, result.documentId);
+        cache.set(result.tags, document);
+        await wait();
+      }
     }
 
     log('Cached %o articles', relevantResults.length);
