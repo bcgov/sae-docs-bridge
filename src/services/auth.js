@@ -1,4 +1,5 @@
 const config = require('config');
+const { decode } = require('jsonwebtoken');
 const nodeFetch = require('node-fetch');
 const fetch = require('fetch-retry')(nodeFetch);
 const log = require('../utils/log');
@@ -32,8 +33,19 @@ async function authenticate() {
   }
 }
 
+// Returns true if still valid
+function verify(t = token) {
+  const decoded = decode(t);
+
+  if (!decoded) {
+    return false;
+  }
+
+  return Date.now() < decoded.exp * 1000;
+}
+
 async function getToken() {
-  if (!token) {
+  if (!token || !verify()) {
     try {
       token = await authenticate();
       return token;
@@ -45,21 +57,29 @@ async function getToken() {
   return Promise.resolve(token);
 }
 
-async function middleware(req, res, next) {
-  if (token) {
-    req.token = token;
-    return next();
-  }
-
-  try {
-    token = await authenticate();
-    req.token = token;
-    next();
-  } catch (err) {
-    next(err);
-  }
+async function hoc(func, ...rest) {
+  const token = await getToken();
+  func.call(null, ...rest, token);
 }
 
+function middleware() {
+  return async function(req, res, next) {
+    if (token && verify()) {
+      req.token = token;
+      return next();
+    }
+
+    try {
+      token = await authenticate();
+      req.token = token;
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
+}
+
+/* istanbul ignore next */
 function reset() {
   if (process.env.NODE_ENV === 'test') {
     token = null;
@@ -69,7 +89,9 @@ function reset() {
 module.exports = {
   authenticate,
   getToken,
+  hoc,
   init,
   middleware,
   reset,
+  verify,
 };

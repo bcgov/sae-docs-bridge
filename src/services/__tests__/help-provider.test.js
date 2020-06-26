@@ -35,6 +35,7 @@ describe('services/help-provider', () => {
 
   describe('#search', () => {
     it('should search', async () => {
+      /* eslint-disable no-useless-escape */
       await expect(search('123', ['app1', 'app2'])).resolves.toEqual(results);
       expect(fetchMock).toHaveLastFetched(
         'https://help-api/api/search',

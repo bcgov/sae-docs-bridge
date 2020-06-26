@@ -11,7 +11,6 @@ const v1 = require('./routes/api/v1');
 
 // Config
 const applications = config.get('applications');
-const host = config.get('host');
 const whitelist = config.get('whitelist');
 const format = config.get('morganFormat');
 
@@ -38,15 +37,13 @@ app.use([cors(corsOptions), auth.middleware()]);
 app.use('/api/v1', v1);
 
 // Catch the flush event and refresh cache
-app.on('flush', async () => {
-  const token = await auth.getToken();
-  prefetch(applications, cache, token);
+app.on('flush', () => {
+  auth.hoc(prefetch, applications, cache);
 });
 
 module.exports = {
-  async boot() {
-    const token = await auth.init();
-    auth.prefetch(applications, cache, token);
+  boot() {
+    auth.hoc(prefetch, applications, cache);
     return app;
   },
 };
