@@ -4,7 +4,9 @@ const fetchMock = require('node-fetch');
 
 const { getDocument, prefetch, search } = require('../help-provider');
 const cache = require('../cache');
+
 fetchMock.config.overwriteRoutes = true;
+
 const result = [
   {
     id: 'container-1',
@@ -88,6 +90,9 @@ describe('services/help-provider', () => {
       const document = {
         id: '111b',
       };
+      fetchMock.post('https://help-api/api/public/authenticate', {
+        token: '123',
+      });
       fetchMock.post('https://help-api/api/search', [
         {
           id: '111a',

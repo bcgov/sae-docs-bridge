@@ -4,14 +4,14 @@ const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
 
-const authMiddleware = require('./middleware/auth');
+const auth = require('./services/auth');
 const cache = require('./services/cache');
 const { prefetch } = require('./services/help-provider');
 const v1 = require('./routes/api/v1');
 
 // Config
 const applications = config.get('applications');
-const token = config.get('token');
+const host = config.get('host');
 const whitelist = config.get('whitelist');
 const format = config.get('morganFormat');
 
@@ -34,20 +34,19 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan(format));
 }
 
-app.use([
-  authMiddleware({
-    token,
-  }),
-  cors(corsOptions),
-]);
+app.use([cors(corsOptions), auth.middleware()]);
 app.use('/api/v1', v1);
 
 // Catch the flush event and refresh cache
-app.on('flush', () => prefetch(applications, cache, token));
+app.on('flush', async () => {
+  const token = await auth.getToken();
+  prefetch(applications, cache, token);
+});
 
 module.exports = {
-  boot() {
-    prefetch(applications, cache, token);
+  async boot() {
+    const token = await auth.init();
+    auth.prefetch(applications, cache, token);
     return app;
   },
 };
